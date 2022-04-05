@@ -49,8 +49,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Compile flink-connector-elasticsearch
-        run: mvn clean test-compile -T2 -Dscala-2.12 -Dflink.convergence.phase=install -Dmaven.javadoc.skip=true -DskipTests -Dfast -U -B ${{ env.MVN_CONNECTION_OPTIONS }}
+#      - name: Compile flink-connector-elasticsearch
+#        run: mvn clean test-compile -T2 -Dscala-2.12 -Dflink.convergence.phase=install -Dmaven.javadoc.skip=true -DskipTests -Dfast -U -B ${{ env.MVN_CONNECTION_OPTIONS }}
+#
+#      - name: Test flink-connector-elasticsearch
+#        run: mvn install -Dscala-2.12 -B --no-snapshot-updates ${{ env.MVN_CONNECTION_OPTIONS }}
 
-      - name: Test flink-connector-elasticsearch
-        run: mvn install -Dscala-2.12 -B --no-snapshot-updates ${{ env.MVN_CONNECTION_OPTIONS }}
+      - name: Compile and test flink-connector-elasticsearch
+        run: mvn clean install -Dscala-2.12 -Dflink.convergence.phase=install -U ${{ env.MVN_CONNECTION_OPTIONS }}
