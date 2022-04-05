@@ -19,7 +19,7 @@
 name: Build flink-connector-elasticsearch
 on: [push, pull_request]
 jobs:
-  compile_ci:
+  compile_and_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,6 +27,8 @@ jobs:
     env:
       MVN_CONNECTION_OPTIONS: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
     steps:
+      - run: echo "Running CI pipeline for JDK version ${{ matrix.jdk }}"
+
       - name: Check out repository code
         uses: actions/checkout@v2
 
@@ -35,25 +37,12 @@ jobs:
         with:
           java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
+          cache: 'maven'
 
       - name: Set Maven 3.8.5
         uses: stCarolas/setup-maven@v4.2
         with:
           maven-version: 3.8.5
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-#      - name: Compile flink-connector-elasticsearch
-#        run: mvn clean test-compile -T2 -Dscala-2.12 -Dflink.convergence.phase=install -Dmaven.javadoc.skip=true -DskipTests -Dfast -U -B ${{ env.MVN_CONNECTION_OPTIONS }}
-#
-#      - name: Test flink-connector-elasticsearch
-#        run: mvn install -Dscala-2.12 -B --no-snapshot-updates ${{ env.MVN_CONNECTION_OPTIONS }}
-
       - name: Compile and test flink-connector-elasticsearch
-        run: mvn clean install -Dscala-2.12 -Dflink.convergence.phase=install -U ${{ env.MVN_CONNECTION_OPTIONS }}
+        run: mvn clean install -Dscala-2.12 -Dflink.convergence.phase=install -U -B ${{ env.MVN_CONNECTION_OPTIONS }}
